@@ -22,15 +22,19 @@ const Person = mongoose.model('Person', personSchema);
 
 // Function to create and save a new person
 const createAndSavePerson = (done) => {
+  // Create a new instance of the Person model with name, age, and favoriteFoods fields
   const person = new Person({
-    name: "John Doe",
-    age: 25,
-    favoriteFoods: ["Pizza", "Burgers"]
+    name: "John Doe", // Name of the person
+    age: 25,          // Age of the person
+    favoriteFoods: ["Pizza", "Burgers"] // Array of favorite foods
   });
 
-  person.save((err, data) => {
-    if (err) return done(err);
-    done(null, data); // Return saved person data
+  // Save the created person document to the database
+  person.save(function(err, data) {
+    if (err) {
+      return done(err); // Pass any errors to the callback
+    }
+    done(null, data); // Pass the saved data to the callback
   });
 };
 
