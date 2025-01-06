@@ -40,9 +40,12 @@ const createAndSavePerson = (done) => {
 
 // Function to create many people
 const createManyPeople = (arrayOfPeople, done) => {
+  // Use the Person model to create multiple people by passing the arrayOfPeople
   Person.create(arrayOfPeople, (err, data) => {
-    if (err) return done(err);
-    done(null, data); // Return array of saved people data
+    if (err) {
+      return done(err); // If there's an error, pass it to the callback
+    }
+    done(null, data); // Pass the saved data to the callback if successful
   });
 };
 
