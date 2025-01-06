@@ -1,5 +1,5 @@
 require('dotenv').config();
-const mongoose = require('mongoose'); // Import mongoose
+const mongoose = require('mongoose'); // Import mongoose to interact with MongoDB
 
 // Connect to MongoDB using the URI from the environment variable
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -10,18 +10,23 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     console.error("Error connecting to MongoDB:", error);
   });
 
-// Define the schema and model for a Person
+// Define the person schema
 const personSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  age: { type: Number, required: true },
-  favoriteFood: { type: String }
+  name: { type: String, required: true }, // Name field is required
+  age: { type: Number, required: true },  // Age field is required
+  favoriteFoods: { type: [String], required: true }  // favoriteFoods is an array of strings and is required
 });
 
-const Person = mongoose.model("Person", personSchema); // Create Person model from schema
+// Create a model from the schema and assign it to the Person variable
+const Person = mongoose.model('Person', personSchema);
 
-// Create and Save a Person
+// Function to create and save a new person
 const createAndSavePerson = (done) => {
-  const person = new Person({ name: "John Doe", age: 25, favoriteFood: "Pizza" });
+  const person = new Person({
+    name: "John Doe",
+    age: 25,
+    favoriteFoods: ["Pizza", "Burgers"]
+  });
 
   person.save((err, data) => {
     if (err) return done(err);
@@ -29,7 +34,7 @@ const createAndSavePerson = (done) => {
   });
 };
 
-// Create Many People
+// Function to create many people
 const createManyPeople = (arrayOfPeople, done) => {
   Person.create(arrayOfPeople, (err, data) => {
     if (err) return done(err);
@@ -37,7 +42,7 @@ const createManyPeople = (arrayOfPeople, done) => {
   });
 };
 
-// Find People by Name
+// Function to find people by their name
 const findPeopleByName = (personName, done) => {
   Person.find({ name: personName }, (err, data) => {
     if (err) return done(err);
@@ -45,15 +50,15 @@ const findPeopleByName = (personName, done) => {
   });
 };
 
-// Find One by Food
+// Function to find a person by their favorite food
 const findOneByFood = (food, done) => {
-  Person.findOne({ favoriteFood: food }, (err, data) => {
+  Person.findOne({ favoriteFoods: food }, (err, data) => {
     if (err) return done(err);
-    done(null, data); // Return first person with the given food
+    done(null, data); // Return the first person who has the given food
   });
 };
 
-// Find Person by ID
+// Function to find a person by their ID
 const findPersonById = (personId, done) => {
   Person.findById(personId, (err, data) => {
     if (err) return done(err);
@@ -61,13 +66,13 @@ const findPersonById = (personId, done) => {
   });
 };
 
-// Find, Edit and Save
+// Function to find, edit and save a person
 const findEditThenSave = (personId, done) => {
   const foodToAdd = "hamburger";
 
   Person.findById(personId, (err, person) => {
     if (err) return done(err);
-    person.favoriteFood = foodToAdd;
+    person.favoriteFoods.push(foodToAdd); // Add the food to the list
 
     person.save((err, data) => {
       if (err) return done(err);
@@ -76,14 +81,14 @@ const findEditThenSave = (personId, done) => {
   });
 };
 
-// Find and Update
+// Function to find and update a person by their name
 const findAndUpdate = (personName, done) => {
   const ageToSet = 20;
 
   Person.findOneAndUpdate(
     { name: personName },
     { age: ageToSet },
-    { new: true },
+    { new: true }, // Return the updated document
     (err, data) => {
       if (err) return done(err);
       done(null, data); // Return updated person data
@@ -91,7 +96,7 @@ const findAndUpdate = (personName, done) => {
   );
 };
 
-// Remove by ID
+// Function to remove a person by their ID
 const removeById = (personId, done) => {
   Person.findByIdAndRemove(personId, (err, data) => {
     if (err) return done(err);
@@ -99,24 +104,24 @@ const removeById = (personId, done) => {
   });
 };
 
-// Remove Many People
+// Function to remove many people with the name "Mary"
 const removeManyPeople = (done) => {
   const nameToRemove = "Mary";
 
   Person.deleteMany({ name: nameToRemove }, (err, data) => {
     if (err) return done(err);
-    done(null, data); // Return result of deletion
+    done(null, data); // Return the result of the deletion
   });
 };
 
-// Query Chain
+// Function to chain a query (e.g., searching for a food)
 const queryChain = (done) => {
   const foodToSearch = "burrito";
 
-  Person.find({ favoriteFood: foodToSearch })
+  Person.find({ favoriteFoods: foodToSearch })
     .sort({ name: 1 }) // Sort by name in ascending order
     .limit(5) // Limit to 5 results
-    .select("name favoriteFood") // Only return name and favoriteFood fields
+    .select("name favoriteFoods") // Only return name and favoriteFoods fields
     .exec((err, data) => {
       if (err) return done(err);
       done(null, data); // Return queried data
