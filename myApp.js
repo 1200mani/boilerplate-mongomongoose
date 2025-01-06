@@ -52,10 +52,11 @@ const createManyPeople = (arrayOfPeople, done) => {
 // Function to find people by their name
 const findPeopleByName = (personName, done) => {
   Person.find({ name: personName }, (err, data) => {
-    if (err) return done(err);
+    if (err) {return done(err);}
     done(null, data); // Return people with the given name
   });
 };
+
 
 // Function to find a person by their favorite food
 const findOneByFood = (food, done) => {
