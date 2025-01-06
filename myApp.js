@@ -61,7 +61,7 @@ const findPeopleByName = (personName, done) => {
 // Function to find a person by their favorite food
 const findOneByFood = (food, done) => {
   Person.findOne({ favoriteFoods: food }, (err, data) => {
-    if (err) return done(err);
+    if (err) { return done(err);}
     done(null, data); // Return the first person who has the given food
   });
 };
